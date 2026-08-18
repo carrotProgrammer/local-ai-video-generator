@@ -5,6 +5,9 @@
 - **Wan2.2 Fun InP A14B**：首帧 + 尾帧视频，包含质量与 LightX2V 快速模式。
 - **MiniMax H3 FL2VA**：首帧 + 尾帧生成视频，并在同一次推理中生成同步双声道音频。
 
+> [!IMPORTANT]
+> 当前一键安装脚本是针对 **Windows 11 + NVIDIA GeForce RTX 5090（32 GB 显存）+ CUDA 13.0** 编写并实际验证的。脚本固定安装 PyTorch 2.12.1 的 `cu130` 构建，不会自动根据显卡选择其他 PyTorch/CUDA 版本。其他 NVIDIA 显卡可能需要自行调整依赖和显存参数；AMD、Intel、Apple Silicon 及纯 CPU 环境没有经过验证，也不属于当前脚本的支持范围。
+
 ## 仓库内容与隐私
 
 GitHub 仓库只包含安装/启停脚本、模型清单和三份通用工作流模板，不包含以下本地内容：
@@ -17,22 +20,56 @@ GitHub 仓库只包含安装/启停脚本、模型清单和三份通用工作流
 
 这些内容均由 `.gitignore` 排除。三个工作流只引用通用的 `start_image.png` 与 `end_image.png` 占位名称；使用时请在 ComfyUI 中选择自己的素材。若创建包含私人提示词或素材路径的工作流，请不要直接提交到公开仓库。
 
-## 已验证环境
+## 硬件、软件和空间要求
 
-- Windows 11、Windows PowerShell 5.1
-- NVIDIA GeForce RTX 5090，31.84 GiB 显存
-- PyTorch 2.12.1 + CUDA 13.0，包含 `sm_120`
-- ComfyUI 0.30.0 或更高版本（本机当前为 0.31.0）
+已实际验证的环境：
 
-## 安装与模型下载
+| 项目 | 已验证配置 |
+| --- | --- |
+| 操作系统 | Windows 11、Windows PowerShell 5.1 |
+| 显卡 | NVIDIA GeForce RTX 5090，31.84 GiB 可用显存 |
+| PyTorch / CUDA | PyTorch 2.12.1 + CUDA 13.0，包含 `sm_120` |
+| ComfyUI | 0.30.0 或更高版本；发布前验证版本为 0.31.0 |
 
-首次安装运行：
+首次安装前还需要：
+
+- 已安装 Conda，并且 PowerShell 中执行 `conda --version` 能正常返回；
+- 能访问 GitHub、PyTorch 下载源和 Hugging Face；
+- 稳定网络连接，模型下载总量约 **75 GiB**；
+- 建议至少预留 **100 GiB** 磁盘空间；若下载回退到 Hugging Face 缓存或保留其他模型，需要更多空间；
+- 足够的系统内存用于 ComfyUI 模型卸载。32 GB 显存是本项目唯一实际验证过的显存配置，低显存显卡不保证能够运行这些工作流。
+
+当前脚本不自动检测显卡型号，也不自动为 RTX 4090、RTX 3090、专业卡或较低显存显卡更换 PyTorch/CUDA 构建。若不是 RTX 5090，请先检查驱动、CUDA 兼容性和显存需求，不要直接假定一键安装配置适用。
+
+## 从 Git clone 到首次启动
+
+在 PowerShell 中运行：
 
 ```powershell
+git clone https://github.com/carrotProgrammer/comfyui-video-project.git
+cd comfyui-video-project
 .\setup.bat
 ```
 
-安装程序会建立项目内 `.venv`、安装 ComfyUI 依赖，并下载 Wan2.2 与 MiniMax H3 的全部模型。下载支持 Hugging Face 缓存和断点续传；重复运行会跳过字节数正确的文件。
+也可以从 GitHub 下载 ZIP、解压后双击 `setup.bat`。首次运行时，`setup.bat` 会自动：
+
+1. 使用 Conda 在项目内创建 `.venv`，包含 Python 3.12 和 Git；
+2. 从 [Comfy-Org/ComfyUI](https://github.com/Comfy-Org/ComfyUI) 克隆官方 ComfyUI 到本地 `ComfyUI` 文件夹；
+3. 安装 PyTorch 2.12.1、TorchVision 0.27.1、CUDA 13.0 构建和 ComfyUI 依赖；
+4. 从 Hugging Face 下载 Wan2.2 与 MiniMax H3 的全部模型，总计约 75 GiB；
+5. 校验 CUDA、显卡、ComfyUI 版本、三份工作流以及每个模型文件的大小。
+
+GitHub 仓库本身不包含 ComfyUI 源码或模型权重；这些内容只会由 `setup.bat` 下载到用户自己的电脑。重复运行 `setup.bat` 时，字节数正确的模型会跳过，未完成的下载会尝试续传。
+
+安装与校验成功后再运行：
+
+```powershell
+.\start_comfyui.bat
+```
+
+`start_comfyui.bat` 只负责启动已经安装好的 ComfyUI，不会代替首次安装。如果 `.venv` 或 `ComfyUI\main.py` 不存在，启动脚本会提示先运行 `setup.bat`。
+
+## 单独下载 MiniMax H3 模型
 
 如果 Wan2.2 已安装，只想下载 H3（约 39.56 GiB）：
 
