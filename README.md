@@ -1,6 +1,6 @@
-# 本地 ComfyUI 首尾帧音视频项目
+# 本地 AI 视频生成器：首尾帧动画与同步音频
 
-本项目在同一个 ComfyUI 环境中提供两套相互独立的工作流：
+这是一个在 Windows 本地运行的 AI 视频生成器（AI video generator / image-to-video），通过 ComfyUI 提供首帧与尾帧之间的视频生成、快速图生视频，以及带同步双声道音频的视频生成。项目包含两套相互独立的工作流：
 
 - **Wan2.2 Fun InP A14B**：首帧 + 尾帧视频，包含质量与 LightX2V 快速模式。
 - **MiniMax H3 FL2VA**：首帧 + 尾帧生成视频，并在同一次推理中生成同步双声道音频。
@@ -46,8 +46,8 @@ GitHub 仓库只包含安装/启停脚本、模型清单和三份通用工作流
 在 PowerShell 中运行：
 
 ```powershell
-git clone https://github.com/carrotProgrammer/comfyui-video-project.git
-cd comfyui-video-project
+git clone https://github.com/carrotProgrammer/local-ai-video-generator.git
+cd local-ai-video-generator
 .\setup.bat
 ```
 
